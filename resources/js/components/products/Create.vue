@@ -83,14 +83,10 @@
               >
 
               <div class="col-md-6">
-                <input
-                  v-model="form.image"
-                  id="image"
-                  type="text"
-                  class="form-control"
-                  autocomplete="image"
-                  autofocus
-                />
+                <input type="file" id="image" class="form-control-file" @change="onFileChange">
+              </div>
+              <div class="col-md-6">
+                <img v-bind:src="imagePreview" width="100" height="100" v-show="showPreview"/> 
               </div>
             </div>
 
@@ -115,14 +111,22 @@ export default {
         price: 0,
         upc: "",
         status: "",
-        image: "",
+        image: null,
       },
+      imagePreview: null,
+      showPreview: false,
     };
   },
   methods: {
     storeProduct() {
+      let formData = new FormData()
+      formData.append("name", this.form.name);
+      formData.append("price", this.form.price);
+      formData.append("upc", this.form.upc);
+      formData.append("status", this.form.status);
+      formData.append("image", this.form.image);
       axios
-        .post("/api/product/store", this.form)
+        .post("/api/product/store", formData)
         .then((res) => {
           this.$router.push({ name: "ProductIndex" });
         })
@@ -130,6 +134,50 @@ export default {
           console.log(error);
         });
     },
+    onFileChange(event){
+      /*
+      Set the local file variable to what the user has selected.
+      */
+      this.form.image = event.target.files[0];
+
+      /*
+      Initialize a File Reader object
+      */
+      let reader  = new FileReader();
+
+      /*
+      Add an event listener to the reader that when the file
+      has been loaded, we flag the show preview as true and set the
+      image to be what was read from the reader.
+      */
+      reader.addEventListener("load", function () {
+          this.showPreview = true;
+          this.imagePreview = reader.result;
+      }.bind(this), false);
+
+      /*
+      Check to see if the file is not empty.
+      */
+      if( this.form.image ){
+          /*
+              Ensure the file is an image file.
+          */
+          if ( /\.(jpe?g|png|gif|webp)$/i.test( this.form.image.name ) ) {
+
+              console.log("here");
+              /*
+              Fire the readAsDataURL method which will read the file in and
+              upon completion fire a 'load' event which we will listen to and
+              display the image in the preview.
+              */
+              reader.readAsDataURL( this.form.image );
+          }
+      }
+      else{
+        this.showPreview = false;
+
+      }
+    }
   },
 };
 </script>

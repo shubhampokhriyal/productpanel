@@ -2169,10 +2169,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2181,21 +2177,71 @@ __webpack_require__.r(__webpack_exports__);
         price: 0,
         upc: "",
         status: "",
-        image: ""
-      }
+        image: null
+      },
+      imagePreview: null,
+      showPreview: false
     };
   },
   methods: {
     storeProduct: function storeProduct() {
       var _this = this;
 
-      axios.post("/api/product/store", this.form).then(function (res) {
+      var formData = new FormData();
+      formData.append("name", this.form.name);
+      formData.append("price", this.form.price);
+      formData.append("upc", this.form.upc);
+      formData.append("status", this.form.status);
+      formData.append("image", this.form.image);
+      axios.post("/api/product/store", formData).then(function (res) {
         _this.$router.push({
           name: "ProductIndex"
         });
       })["catch"](function (error) {
         console.log(error);
       });
+    },
+    onFileChange: function onFileChange(event) {
+      /*
+      Set the local file variable to what the user has selected.
+      */
+      this.form.image = event.target.files[0];
+      /*
+      Initialize a File Reader object
+      */
+
+      var reader = new FileReader();
+      /*
+      Add an event listener to the reader that when the file
+      has been loaded, we flag the show preview as true and set the
+      image to be what was read from the reader.
+      */
+
+      reader.addEventListener("load", function () {
+        this.showPreview = true;
+        this.imagePreview = reader.result;
+      }.bind(this), false);
+      /*
+      Check to see if the file is not empty.
+      */
+
+      if (this.form.image) {
+        /*
+            Ensure the file is an image file.
+        */
+        if (/\.(jpe?g|png|gif|webp)$/i.test(this.form.image.name)) {
+          console.log("here");
+          /*
+          Fire the readAsDataURL method which will read the file in and
+          upon completion fire a 'load' event which we will listen to and
+          display the image in the preview.
+          */
+
+          reader.readAsDataURL(this.form.image);
+        }
+      } else {
+        this.showPreview = false;
+      }
     }
   }
 });
@@ -2317,10 +2363,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2330,7 +2372,9 @@ __webpack_require__.r(__webpack_exports__);
         upc: "",
         status: "",
         image: ""
-      }
+      },
+      imagePreview: null,
+      showPreview: false
     };
   },
   created: function created() {
@@ -2342,18 +2386,68 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get("/api/product/" + this.$route.params.id).then(function (res) {
         _this.form = res.data;
+        _this.imagePreview = '../storage/' + res.data.image;
+        _this.showPreview = true;
       });
     },
     updateProduct: function updateProduct() {
       var _this2 = this;
 
-      axios.put("/api/product/" + this.$route.params.id, this.form).then(function (res) {
+      var formData = new FormData();
+      formData.append("name", this.form.name);
+      formData.append("price", this.form.price);
+      formData.append("upc", this.form.upc);
+      formData.append("status", this.form.status);
+      formData.append("image", this.form.image);
+      axios.post("/api/product/" + this.$route.params.id, formData).then(function (res) {
         _this2.$router.push({
           name: "ProductIndex"
         });
       })["catch"](function (error) {
         console.log(error);
       });
+    },
+    onFileChange: function onFileChange(event) {
+      /*
+      Set the local file variable to what the user has selected.
+      */
+      this.form.image = event.target.files[0];
+      /*
+      Initialize a File Reader object
+      */
+
+      var reader = new FileReader();
+      /*
+      Add an event listener to the reader that when the file
+      has been loaded, we flag the show preview as true and set the
+      image to be what was read from the reader.
+      */
+
+      reader.addEventListener("load", function () {
+        this.showPreview = true;
+        this.imagePreview = reader.result;
+      }.bind(this), false);
+      /*
+      Check to see if the file is not empty.
+      */
+
+      if (this.form.image) {
+        /*
+            Ensure the file is an image file.
+        */
+        if (/\.(jpe?g|png|gif|webp)$/i.test(this.form.image.name)) {
+          console.log("here");
+          /*
+          Fire the readAsDataURL method which will read the file in and
+          upon completion fire a 'load' event which we will listen to and
+          display the image in the preview.
+          */
+
+          reader.readAsDataURL(this.form.image);
+        }
+      } else {
+        this.showPreview = false;
+      }
     }
   }
 });
@@ -38404,29 +38498,26 @@ var render = function () {
                 _vm._v(" "),
                 _c("div", { staticClass: "col-md-6" }, [
                   _c("input", {
+                    staticClass: "form-control-file",
+                    attrs: { type: "file", id: "image" },
+                    on: { change: _vm.onFileChange },
+                  }),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-6" }, [
+                  _c("img", {
                     directives: [
                       {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.form.image,
-                        expression: "form.image",
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.showPreview,
+                        expression: "showPreview",
                       },
                     ],
-                    staticClass: "form-control",
                     attrs: {
-                      id: "image",
-                      type: "text",
-                      autocomplete: "image",
-                      autofocus: "",
-                    },
-                    domProps: { value: _vm.form.image },
-                    on: {
-                      input: function ($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.$set(_vm.form, "image", $event.target.value)
-                      },
+                      src: _vm.imagePreview,
+                      width: "100",
+                      height: "100",
                     },
                   }),
                 ]),
@@ -38701,29 +38792,26 @@ var render = function () {
                 _vm._v(" "),
                 _c("div", { staticClass: "col-md-6" }, [
                   _c("input", {
+                    staticClass: "form-control-file",
+                    attrs: { type: "file", id: "image" },
+                    on: { change: _vm.onFileChange },
+                  }),
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col-md-6" }, [
+                  _c("img", {
                     directives: [
                       {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.form.image,
-                        expression: "form.image",
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.showPreview,
+                        expression: "showPreview",
                       },
                     ],
-                    staticClass: "form-control",
                     attrs: {
-                      id: "image",
-                      type: "text",
-                      autocomplete: "image",
-                      autofocus: "",
-                    },
-                    domProps: { value: _vm.form.image },
-                    on: {
-                      input: function ($event) {
-                        if ($event.target.composing) {
-                          return
-                        }
-                        _vm.$set(_vm.form, "image", $event.target.value)
-                      },
+                      src: _vm.imagePreview,
+                      width: "100",
+                      height: "100",
                     },
                   }),
                 ]),

@@ -28,7 +28,6 @@ class ProductStoreRequest extends FormRequest
             'price' => 'required|numeric|min:0',
             'upc' => ['required'],
             'status' => ['required'],
-            'image' => ['required'],
         ];
     }
 }

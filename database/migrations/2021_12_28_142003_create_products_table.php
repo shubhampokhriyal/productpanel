@@ -19,7 +19,7 @@ class CreateProductsTable extends Migration
             $table->double("price");
             $table->string("upc");
             $table->tinyInteger("status")->default(1);
-            $table->text("image");
+            $table->text("image")->nullable();
             $table->timestamps();
         });
     }

@@ -38,7 +38,11 @@ class ProductDataController extends Controller
      */
     public function store(ProductStoreRequest $request)
     {
+        $path = $request->file('image')->store(
+            'images', 'public'
+        );
         $product = Product::create($request->validated());
+        Product::whereId($product->id)->update(['image'=>$path]);
         return response()->json($product);
     }
 
@@ -75,7 +79,14 @@ class ProductDataController extends Controller
      */
     public function update(ProductStoreRequest $request, $id)
     {
-        product::whereId($id)->update($request->validated());
+        // dd($request->all());
+        if($request->file('image')){
+            $path = $request->file('image')->store(
+                'images', 'public'
+            );
+            Product::whereId($id)->update(['image'=>$path]);
+        }
+        Product::whereId($id)->update($request->validated());
         return response()->json('Updated');
     }
 
