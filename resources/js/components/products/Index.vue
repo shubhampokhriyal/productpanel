@@ -6,7 +6,7 @@
       <!-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
                                 class="fas fa-download fa-sm text-white-50"></i> Generate Report</a> -->
     </div>
-    <div class="row">
+    <div class="row wholeindexrow">
       <div class="card card-mx">
         <div v-if="showMessage" class="m-2">
           <div class="alert alert-success">
@@ -34,7 +34,7 @@
           </button>
         </div>
         <div class="card-body">
-          <table class="table table-striped">
+          <table class="table table-striped table-responsive">
             <thead>
               <tr>
                 <th scope="col">
@@ -45,13 +45,12 @@
                 <th scope="col">Price</th>
                 <th scope="col">UPC</th>
                 <th scope="col">Status</th>
-                <th scope="col">Img</th>
-                <th scope="col"></th>
-                <th scope="col"></th>
+                <th scope="col">Image</th>
+                <th scope="col" class="actionth"></th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="product in products" :key="product.id">
+              <tr v-for="(product,index) in products" :key="product.id">
                 <td>
                   <input
                     type="checkbox"
@@ -59,26 +58,23 @@
                     :value="product.id"
                   />
                 </td>
-                <td>{{ product.id }}</td>
+                <td>{{ index+1 }}</td>
                 <td>{{ product.name }}</td>
                 <td>{{ product.price }}</td>
                 <td>{{ product.upc }}</td>
-                <td>{{ product.status }}</td>
-                <td>{{ product.image }}</td>
+                <td>{{ product.status | statusMap }}</td>
+                <td>
+                  <div class="col-md-6">
+                    <a :href="'../storage/'+product.image" target="_blank"><img v-bind:src="'../storage/'+product.image" width="50" height="50"/></a> 
+                  </div>
+                </td>
                 <td>
                   <router-link
                     :to="{ name: 'ProductEdit', params: { id: product.id } }"
                     class="btn btn-info btn-sm"
-                    >Edit</router-link
+                    ><i class="fas fa-edit"></i></router-link
                   >
-                </td>
-                <td>
-                  <button
-                    class="btn btn-danger btn-sm"
-                    @click="deleteProduct(product.id)"
-                  >
-                    Delete
-                  </button>
+                  <button class="btn btn-danger btn-sm" @click="deleteProduct(product.id)"><i class="fas fa-trash-alt"></i></button>
                 </td>
               </tr>
             </tbody>
@@ -88,6 +84,14 @@
     </div>
   </div>
 </template>
+<style scoped>
+.actionth{
+  min-width: 95px;
+}
+/* .wholeindexrow{
+  font-size: small;
+} */
+</style>
 
 <script>
 export default {
@@ -144,6 +148,13 @@ export default {
       this.getProducts();
       this.selectedProducts = [];
     },
+  },
+  filters: {
+    statusMap: function (value) {
+      if (value==1) 
+      return 'Active'
+      return 'Deactive'
+    }
   },
   watch: {
     selectAllCheckbox: function (val) {

@@ -67,14 +67,10 @@
               >
 
               <div class="col-md-6">
-                <input
-                  v-model="form.status"
-                  id="status"
-                  type="text"
-                  class="form-control"
-                  autocomplete="status"
-                  autofocus
-                />
+                <select id="status" v-model="form.status" class="form-control">
+                  <option value="1">Active</option>
+                  <option value="0">Deactive</option>
+                </select>
               </div>
             </div>
             <div class="row mb-3">
@@ -110,7 +106,7 @@ export default {
         name: "",
         price: 0,
         upc: "",
-        status: "",
+        status: 1,
         image: null,
       },
       imagePreview: null,

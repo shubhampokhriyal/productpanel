@@ -98,7 +98,7 @@ class ProductDataController extends Controller
      */
     public function destroy($id)
     {
-        Product::whereId($id)->update(['status' => 0]);
+        Product::whereId($id)->delete();
         return response()->json('Deleted');
     }
 
@@ -110,7 +110,7 @@ class ProductDataController extends Controller
      */
     public function destroyBulk(Request $request)
     {
-        Product::whereIn('id', $request->all())->update(['status' => 0]);
+        Product::whereIn('id', $request->all())->delete();
         return response()->json("Deleted");
     }
 }
